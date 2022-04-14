@@ -53,7 +53,7 @@ class Stats:
 
 Rays = collections.namedtuple(
     'Rays',
-    ('origins', 'directions', 'viewdirs', 'radii', 'lossmult', 'near', 'far'))
+    ('origins', 'directions', 'viewdirs', 'radii', 'lossmult', 'near', 'far', 'focaldist'))
 
 
 # TODO(barron): Do a default.gin thing

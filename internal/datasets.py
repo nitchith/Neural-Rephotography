@@ -606,7 +606,7 @@ class FAStack(Dataset):
   #TODO: Loading the dataset
   #TODO: Generate Rays function
   #TODO: Compute radii = A / (2 tc)
-  #TODO: Variable for tc 
+  #TODO: Save tc information in rays
   pass
 
 dataset_dict = {
