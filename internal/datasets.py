@@ -209,7 +209,6 @@ class Dataset(threading.Thread):
         near=ones * self.near,
         far=ones * self.far)
 
-
 class Multicam(Dataset):
   """Multicam Dataset."""
 
@@ -602,6 +601,13 @@ class LLFF(Dataset):
       self.render_poses = new_poses[:, :3, :4]
     return poses_reset
 
+
+class FAStack(Dataset):
+  #TODO: Loading the dataset
+  #TODO: Generate Rays function
+  #TODO: Compute radii = A / (2 tc)
+  #TODO: Variable for tc 
+  pass
 
 dataset_dict = {
     'blender': Blender,

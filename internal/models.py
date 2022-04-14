@@ -67,6 +67,7 @@ class MipNerfModel(nn.Module):
       key, rng = random.split(rng)
       if i_level == 0:
         # Stratified sampling along rays
+        #TODO: Pass tc information
         t_vals, samples = mip.sample_along_rays(
             key,
             rays.origins,
@@ -132,6 +133,12 @@ class MipNerfModel(nn.Module):
       ret.append((comp_rgb, distance, acc))
 
     return ret
+
+@gin.configurable
+class NeReFocusModel(MipNerfModel):
+  #TODO: Pass tc information for sample_along_rays function
+  #TODO: Pass tc information for resample_along_rays function
+  pass
 
 
 def construct_mipnerf(rng, example_batch):

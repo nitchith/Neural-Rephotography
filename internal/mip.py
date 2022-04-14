@@ -121,7 +121,7 @@ def cylinder_to_gaussian(d, t0, t1, radius, diag):
   t_var = (t1 - t0)**2 / 12
   return lift_gaussian(d, t_mean, t_var, r_var, diag)
 
-
+# TODO: Shift t0, t1 and then handle means, convs for before and after tc location
 def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
   """Cast rays (cone- or cylinder-shaped) and featurize sections of it.
 
@@ -224,7 +224,7 @@ def volumetric_rendering(rgb, density, t_vals, dirs, white_bkgd):
     comp_rgb = comp_rgb + (1. - acc[..., None])
   return comp_rgb, distance, acc, weights
 
-
+#TODO: Forward tc value to the cast_rays function
 def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
                       randomized, lindisp, ray_shape):
   """Stratified sampling along the rays.
