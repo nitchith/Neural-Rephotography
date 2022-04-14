@@ -81,20 +81,3 @@ You may need to reduce the batch size to avoid out of memory errors. For example
 ```
 --gin_param="Config.batch_size = 1024"
 ```
-
-## Citation
-If you use this software package, please cite our paper:
-
-```
-@misc{barron2021mipnerf,
-      title={Mip-NeRF: A Multiscale Representation for Anti-Aliasing Neural Radiance Fields},
-      author={Jonathan T. Barron and Ben Mildenhall and Matthew Tancik and Peter Hedman and Ricardo Martin-Brualla and Pratul P. Srinivasan},
-      year={2021},
-      eprint={2103.13415},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-```
-
-## Acknowledgements
-Thanks to [Boyang Deng](https://boyangdeng.com/) for JaxNeRF.
