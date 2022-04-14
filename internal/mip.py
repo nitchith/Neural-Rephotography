@@ -141,8 +141,10 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   
   # Update t0, t1 
   if focaldist is not None:
-    t0 -= focaldist
-    t1 -= focaldist
+    t0_ = jnp.abs(t0 - focaldist)
+    t1_ = jnp.abs(t1 - focaldist)
+    t0 = jnp.minimum(t0_, t1_)
+    t1 = jnp.maximum(t0_, t1_)
 
   if ray_shape == 'cone':
     gaussian_fn = conical_frustum_to_gaussian
