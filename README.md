@@ -42,12 +42,36 @@ conda install pip; pip install --upgrade pip
 # Install requirements
 pip install -r requirements.txt
 ```
-
 [Optional] Install GPU and TPU support for Jax
 ```
 # Remember to change cuda101 to your CUDA version, e.g. cuda110 for CUDA 11.0.
 pip install --upgrade jax jaxlib==0.1.65+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
+
+For Cuda 11:
+```
+# Set cuda-11.0 path
+export LD_LIBRARY_PATH="/usr/local/cuda-11/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+
+# Create environment
+conda create --name nerefocus python=3.6.13
+conda activate nerefocus
+
+# Prepare pip
+conda install pip; pip install --upgrade pip
+
+# Install packages in requirements.txt
+pip install -r requirements.txt
+
+# Check compatible tensorflow and cudnn version to your cuda version - https://www.tensorflow.org/install/source#gpu
+python -m pip install tensorflow==2.4.0
+conda install cudnn=8
+
+# Check compatible jaxlib version - https://storage.googleapis.com/jax-releases/jax_releases.html
+python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.googleapis.com/jax-releases/jax_releases.html
+
+```
+
 
 ## Data
 
