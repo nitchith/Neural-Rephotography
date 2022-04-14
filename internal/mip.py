@@ -33,7 +33,7 @@ def pos_enc(x, min_deg, max_deg, append_identity=True):
   else:
     return four_feat
 
-
+# Equation 11
 def expected_sin(x, x_var):
   """Estimates mean and variance of sin(z), z ~ N(x, var)."""
   # When the variance is wide, shrink sin towards zero.
@@ -42,7 +42,7 @@ def expected_sin(x, x_var):
       0, 0.5 * (1 - jnp.exp(-2 * x_var) * math.safe_cos(2 * x)) - y**2)
   return y, y_var
 
-
+# Equation 8
 def lift_gaussian(d, t_mean, t_var, r_var, diag):
   """Lift a Gaussian defined along a ray to 3D coordinates."""
   mean = d[..., None, :] * t_mean[..., None]
@@ -65,7 +65,7 @@ def lift_gaussian(d, t_mean, t_var, r_var, diag):
     cov = t_cov + xy_cov
     return mean, cov
 
-
+# Equation 7
 def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, stable=True):
   """Approximate a conical frustum as a Gaussian distribution (mean+cov).
 
@@ -148,7 +148,7 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
   means = means + origins[..., None, :]
   return means, covs
 
-
+# Equation 10
 def integrated_pos_enc(x_coord, min_deg, max_deg, diag=True):
   """Encode `x` with sinusoids scaled by 2^[min_deg:max_deg-1].
 
@@ -184,6 +184,7 @@ def integrated_pos_enc(x_coord, min_deg, max_deg, diag=True):
       jnp.concatenate([y_var] * 2, axis=-1))[0]
 
 
+# Section 3.2
 def volumetric_rendering(rgb, density, t_vals, dirs, white_bkgd):
   """Volumetric Rendering Function.
 
