@@ -154,7 +154,13 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
     assert False
   
   means, covs = gaussian_fn(directions, t0, t1, radii, diag)
-  means = means + origins[..., None, :]
+
+  #TODO: Review this implementation
+  if focaldist is not None:
+    means = means + origins[..., None, :] + directions[..., None, :] * focaldist[..., None]
+  else:
+    means = means + origins[..., None, :]
+
   return means, covs
 
 # Equation 10
