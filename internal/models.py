@@ -47,7 +47,7 @@ class MipNerfModel(nn.Module):
   disable_integration: bool = False  # If True, use PE instead of IPE.
 
   @nn.compact
-  def get_tvals_samples(self, i_level, rays, key, randomized, weights):
+  def get_tvals_samples(self, i_level, rays, key, randomized, weights, focaldist):
     if i_level == 0:
         # Stratified sampling along rays
         #TODO: Pass tc information
@@ -62,6 +62,7 @@ class MipNerfModel(nn.Module):
             randomized,
             self.lindisp,
             self.ray_shape,
+            rays.focaldist
         )
     else:
         t_vals, samples = mip.resample_along_rays(
@@ -75,6 +76,7 @@ class MipNerfModel(nn.Module):
             self.ray_shape,
             self.stop_level_grad,
             resample_padding=self.resample_padding,
+            focaldist = rays.focaldist
         )
     return t_vals, samples
 
@@ -98,7 +100,7 @@ class MipNerfModel(nn.Module):
     for i_level in range(self.num_levels):
       key, rng = random.split(rng)
       #TODO: Pass tc information
-      t_vals, samples = self.get_tvals_samples(i_level, rays, key, randomized, weights, tc=None)
+      t_vals, samples = self.get_tvals_samples(i_level, rays, key, randomized, weights, focaldist=None)
 
       if self.disable_integration:
         samples = (samples[0], jnp.zeros_like(samples[1]))

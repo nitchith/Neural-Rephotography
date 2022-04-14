@@ -138,16 +138,18 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   """
   t0 = t_vals[..., :-1]
   t1 = t_vals[..., 1:]
+  
+  # Update t0, t1 
+  if focaldist is not None:
+    t0 -= focaldist
+    t1 -= focaldist
+
   if ray_shape == 'cone':
     gaussian_fn = conical_frustum_to_gaussian
   elif ray_shape == 'cylinder':
     gaussian_fn = cylinder_to_gaussian
   else:
     assert False
-
-  if focaldist is not None:
-    #TODO: Fill the code here
-    pass
   
   means, covs = gaussian_fn(directions, t0, t1, radii, diag)
   means = means + origins[..., None, :]
@@ -229,7 +231,7 @@ def volumetric_rendering(rgb, density, t_vals, dirs, white_bkgd):
     comp_rgb = comp_rgb + (1. - acc[..., None])
   return comp_rgb, distance, acc, weights
 
-#TODO: Forward tc value to the cast_rays function
+#DONE: Forward tc value to the cast_rays function
 def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
                       randomized, lindisp, ray_shape, focaldist=None):
   """Stratified sampling along the rays.
@@ -258,7 +260,7 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
     t_vals = 1. / (1. / near * (1. - t_vals) + 1. / far * t_vals)
   else:
     t_vals = near * (1. - t_vals) + far * t_vals
-
+  
   if randomized:
     mids = 0.5 * (t_vals[..., 1:] + t_vals[..., :-1])
     upper = jnp.concatenate([mids, t_vals[..., -1:]], -1)
@@ -268,12 +270,19 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
   else:
     # Broadcast t_vals to make the returned shape consistent.
     t_vals = jnp.broadcast_to(t_vals, [batch_size, num_samples + 1])
+
+  #Add focaldist to t_vals
+  if focaldist is not None:
+    focaldist = jnp.broadcast_to(focaldist,[batch_size, 1])
+    t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
+    t_vals = jnp.sort(t_vals, axis=1)
+
   means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist)
   return t_vals, (means, covs)
 
 
 def resample_along_rays(key, origins, directions, radii, t_vals, weights,
-                        randomized, ray_shape, stop_grad, resample_padding):
+                        randomized, ray_shape, stop_grad, resample_padding, focaldist=None):
   """Resampling.
 
   Args:
