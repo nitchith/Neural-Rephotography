@@ -122,7 +122,7 @@ def cylinder_to_gaussian(d, t0, t1, radius, diag):
   return lift_gaussian(d, t_mean, t_var, r_var, diag)
 
 # TODO: Shift t0, t1 and then handle means, convs for before and after tc location
-def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
+def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldist=None):
   """Cast rays (cone- or cylinder-shaped) and featurize sections of it.
 
   Args:
@@ -144,6 +144,11 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
     gaussian_fn = cylinder_to_gaussian
   else:
     assert False
+
+  if focaldist is not None:
+    #TODO: Fill the code here
+    pass
+  
   means, covs = gaussian_fn(directions, t0, t1, radii, diag)
   means = means + origins[..., None, :]
   return means, covs
@@ -226,7 +231,7 @@ def volumetric_rendering(rgb, density, t_vals, dirs, white_bkgd):
 
 #TODO: Forward tc value to the cast_rays function
 def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
-                      randomized, lindisp, ray_shape):
+                      randomized, lindisp, ray_shape, focaldist=None):
   """Stratified sampling along the rays.
 
   Args:
@@ -263,7 +268,7 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
   else:
     # Broadcast t_vals to make the returned shape consistent.
     t_vals = jnp.broadcast_to(t_vals, [batch_size, num_samples + 1])
-  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape)
+  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist)
   return t_vals, (means, covs)
 
 
