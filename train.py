@@ -201,8 +201,8 @@ def main(unused_argv):
 
   ssim_fn = jax.jit(functools.partial(math.compute_ssim, max_val=1.))
 
-  if not utils.isdir(FLAGS.train_dir):
-    utils.makedirs(FLAGS.train_dir)
+  #if not utils.isdir(FLAGS.train_dir):
+  #  utils.makedirs(FLAGS.train_dir)
   state = checkpoints.restore_checkpoint(FLAGS.train_dir, state)
   # Resume training a the step of the last checkpoint.
   init_step = state.optimizer.state.step + 1

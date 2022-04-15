@@ -1,0 +1,2 @@
+Config.dataset_loader = 'fablender'
+Config.batching = 'single_image'
