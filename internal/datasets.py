@@ -357,7 +357,6 @@ class FABlender(Dataset):
   def _load_renderings(self, config):
     """Load images from disk."""
 
-    #pdb.set_trace()
     if config.render_path:
       raise ValueError('render_path cannot be used for the blender dataset.')
     with utils.open_file(
@@ -500,7 +499,7 @@ class FABlender(Dataset):
     self.rays = utils.Rays(
         origins=self.origins,
         directions=self.directions,
-        viewdirs=viewdirs,
+        viewdirs=self.viewdirs,
         radii=self.radii,
         focaldist=self.focal_dists,
         lossmult=ones,
