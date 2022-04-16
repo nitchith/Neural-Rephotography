@@ -285,7 +285,7 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
     t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
     t_vals = jnp.sort(t_vals, axis=1)
 
-  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist)
+  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
   return t_vals, (means, covs)
 
 
@@ -331,5 +331,5 @@ def resample_along_rays(key, origins, directions, radii, t_vals, weights,
   )
   if stop_grad:
     new_t_vals = lax.stop_gradient(new_t_vals)
-  means, covs = cast_rays(new_t_vals, origins, directions, radii, ray_shape)
+  means, covs = cast_rays(new_t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
   return new_t_vals, (means, covs)

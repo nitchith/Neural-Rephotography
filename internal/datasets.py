@@ -419,13 +419,13 @@ class FABlender(Dataset):
     self.images = np.stack(images, axis=0)
     self.apertures = np.stack(apertures, axis=0)
     self.sensor_dists = np.stack(sensor_dists, axis=0)
-    self.focal_dists = np.stack(focal_dists, axis=0)
+    self.focal_dists = np.expand_dims(np.stack(focal_dists, axis=0), axis=-1)
 
     # Shapes
     # self.images  (220, 1024, 1024, 4)
     # self.apertures  (220,)
     # self.sensor_dists  (220,)
-    # self.focal_dists  (220, 1048576)
+    # self.focal_dists  (220, 1048576, 1)
 
     # TODO: Save near and far distances in json file
     if self.near is None:
@@ -472,9 +472,9 @@ class FABlender(Dataset):
         self.origins.append(origins)
 
         self.radii.append(self.apertures[i]/self.focal_dists[i])
-        print("dirs", directions.shape)
-        print("origins", origins.shape)
-        print("radii", self.radii[-1].shape)
+        #print("dirs", directions.shape)
+        #print("origins", origins.shape)
+        #print("radii", self.radii[-1].shape)
        
 
         # Distance from each unit-norm direction vector to its x-axis neighbor.
@@ -487,7 +487,7 @@ class FABlender(Dataset):
 
     self.origins = np.stack(self.origins, axis=0)
     self.directions = np.stack(self.directions, axis=0)
-    self.radii = np.stack(self.radii, axis=0)
+    self.radii = np.stack(self.radii, axis=0).reshape((-1, self.h, self.w, 1))
     self.viewdirs = self.directions / np.linalg.norm(self.directions, axis=-1, keepdims=True)
 
     # Shapes
