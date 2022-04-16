@@ -24,7 +24,7 @@ import jax
 import numpy as np
 from PIL import Image
 from internal import utils
-
+import pdb
 
 def get_dataset(split, train_dir, config):
   return dataset_dict[config.dataset_loader](split, train_dir, config)
@@ -352,10 +352,12 @@ class Blender(Dataset):
 
 class FABlender(Dataset):
   """FA Stack Blender Dataset."""
-
+  
 
   def _load_renderings(self, config):
     """Load images from disk."""
+
+    #pdb.set_trace()
     if config.render_path:
       raise ValueError('render_path cannot be used for the blender dataset.')
     with utils.open_file(
@@ -381,7 +383,6 @@ class FABlender(Dataset):
       images.append(image)
      
       # Get aperture 
-      print(frame)
       fstop = frame['fstop']
       aperture = self.focus / (2 * fstop) # in meters
       apertures.append(aperture)
@@ -399,7 +400,7 @@ class FABlender(Dataset):
       x = x / (w/2) - 1.0
       y = y / (h/2) - 1.0
 
-      xy_grid = -np.stack(tuple(reversed(np.meshgrid(y,x))), dim=-1).reshape((w*h, 2))
+      xy_grid = -np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
 
       xy_norm = np.linalg.norm(xy_grid, ord=2, axis=1)
 
@@ -416,7 +417,13 @@ class FABlender(Dataset):
     self.apertures = np.stack(apertures, axis=0)
     self.sensor_dists = np.stack(sensor_dists, axis=0)
     self.focal_dists = np.stack(focal_dists, axis=0)
-   
+
+    # Shapes
+    # self.images  (220, 1024, 1024, 4)
+    # self.apertures  (220,)
+    # self.sensor_dists  (220,)
+    # self.focal_dists  (220, 1048576)
+
     if self.near is None:
         self.near = self.focal_dists.min()
 
@@ -450,7 +457,7 @@ class FABlender(Dataset):
 
         camera_dirs = np.stack(
             [(x - self.w * 0.5 + 0.5), 
-            -(y - self.h * 0.5 + 0.5), -sensor_dist],
+            -(y - self.h * 0.5 + 0.5), -sensor_dist * np.ones_like(x)],
             axis=-1)
 
         directions = camera_dirs
@@ -458,11 +465,14 @@ class FABlender(Dataset):
 
         self.directions.append(directions)
 
-        origins = np.broadcast_to(np.zeros((3, 1)), directions.shape)
+        origins = np.broadcast_to(np.zeros((3)), directions.shape)
         self.origins.append(origins)
 
         self.radii.append(self.apertures[i]/self.focal_dists[i])
-
+        print("dirs", directions.shape)
+        print("origins", origins.shape)
+        print("radii", self.radii[-1].shape)
+       
 
         # Distance from each unit-norm direction vector to its x-axis neighbor.
         # dx = np.sqrt(np.sum((directions[:, :-1, :, :] - directions[:, 1:, :, :])**2, -1))
@@ -472,9 +482,14 @@ class FABlender(Dataset):
         # halfway between inscribed by / circumscribed about the pixel.
 
 
-    self.orgins = np.stack(self.origins, axis=0)
+    self.origins = np.stack(self.origins, axis=0)
     self.directions = np.stack(self.directions, axis=0)
     self.radii = np.stack(self.radii, axis=0)
+
+    # Shapes
+    # self.origins  (220, 1024, 1024, 3)
+    # self.directions  (220, 1024, 1024, 3)
+    # self.radii  (220, 1048576)
 
     ones = np.ones_like(self.origins[..., :1])
     self.rays = utils.Rays(
