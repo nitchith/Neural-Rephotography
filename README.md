@@ -7,27 +7,8 @@ https://drive.google.com/file/d/1g_EClvD-T9DkXDihF5zmsUBXlBi34weK/view?usp=shari
 
 
 ## Installation
-We recommend using [Anaconda](https://www.anaconda.com/products/individual) to set
-up the environment. Run the following commands:
 
-```
-# Clone the repo
-git clone https://github.com/google/mipnerf.git; cd mipnerf
-# Create a conda environment, note you can use python 3.6-3.8 as
-# one of the dependencies (TensorFlow) hasn't supported python 3.9 yet.
-conda create --name mipnerf python=3.6.13; conda activate mipnerf
-# Prepare pip
-conda install pip; pip install --upgrade pip
-# Install requirements
-pip install -r requirements.txt
-```
-[Optional] Install GPU and TPU support for Jax
-```
-# Remember to change cuda101 to your CUDA version, e.g. cuda110 for CUDA 11.0.
-pip install --upgrade jax jaxlib==0.1.65+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
-```
-
-For Cuda 11:
+### Tensorflow 2.4+cuda 11.0:
 ```
 # Set cuda-11.0 path
 export LD_LIBRARY_PATH="/usr/local/cuda-11/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
@@ -49,6 +30,25 @@ conda install cudnn=8
 # Check compatible jaxlib version - https://storage.googleapis.com/jax-releases/jax_releases.html
 python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 
+```
+
+### Alternate way (from original repo)
+
+```
+# Clone the repo
+git clone https://github.com/google/mipnerf.git; cd mipnerf
+# Create a conda environment, note you can use python 3.6-3.8 as
+# one of the dependencies (TensorFlow) hasn't supported python 3.9 yet.
+conda create --name mipnerf python=3.6.13; conda activate mipnerf
+# Prepare pip
+conda install pip; pip install --upgrade pip
+# Install requirements
+pip install -r requirements.txt
+```
+[Optional] Install GPU and TPU support for Jax
+```
+# Remember to change cuda101 to your CUDA version, e.g. cuda110 for CUDA 11.0.
+pip install --upgrade jax jaxlib==0.1.65+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
 
 
