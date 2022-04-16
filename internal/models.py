@@ -47,6 +47,40 @@ class MipNerfModel(nn.Module):
   disable_integration: bool = False  # If True, use PE instead of IPE.
 
   @nn.compact
+  def get_tvals_samples(self, i_level, rays, key, randomized, weights, focaldist):
+    if i_level == 0:
+        # Stratified sampling along rays
+        #TODO: Pass tc information
+        t_vals, samples = mip.sample_along_rays(
+            key,
+            rays.origins,
+            rays.directions,
+            rays.radii,
+            self.num_samples,
+            rays.near,
+            rays.far,
+            randomized,
+            self.lindisp,
+            self.ray_shape,
+            rays.focaldist
+        )
+    else:
+        t_vals, samples = mip.resample_along_rays(
+            key,
+            rays.origins,
+            rays.directions,
+            rays.radii,
+            t_vals,
+            weights,
+            randomized,
+            self.ray_shape,
+            self.stop_level_grad,
+            resample_padding=self.resample_padding,
+            focaldist = rays.focaldist
+        )
+    return t_vals, samples
+
+  @nn.compact
   def __call__(self, rng, rays, randomized, white_bkgd):
     """The mip-NeRF Model.
 
@@ -65,34 +99,9 @@ class MipNerfModel(nn.Module):
     ret = []
     for i_level in range(self.num_levels):
       key, rng = random.split(rng)
-      if i_level == 0:
-        # Stratified sampling along rays
-        #TODO: Pass tc information
-        t_vals, samples = mip.sample_along_rays(
-            key,
-            rays.origins,
-            rays.directions,
-            rays.radii,
-            self.num_samples,
-            rays.near,
-            rays.far,
-            randomized,
-            self.lindisp,
-            self.ray_shape,
-        )
-      else:
-        t_vals, samples = mip.resample_along_rays(
-            key,
-            rays.origins,
-            rays.directions,
-            rays.radii,
-            t_vals,
-            weights,
-            randomized,
-            self.ray_shape,
-            self.stop_level_grad,
-            resample_padding=self.resample_padding,
-        )
+      #TODO: Pass tc information
+      t_vals, samples = self.get_tvals_samples(i_level, rays, key, randomized, weights, focaldist=None)
+
       if self.disable_integration:
         samples = (samples[0], jnp.zeros_like(samples[1]))
       samples_enc = mip.integrated_pos_enc(
@@ -133,12 +142,6 @@ class MipNerfModel(nn.Module):
       ret.append((comp_rgb, distance, acc))
 
     return ret
-
-@gin.configurable
-class NeReFocusModel(MipNerfModel):
-  #TODO: Pass tc information for sample_along_rays function
-  #TODO: Pass tc information for resample_along_rays function
-  pass
 
 
 def construct_mipnerf(rng, example_batch):

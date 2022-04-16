@@ -122,7 +122,7 @@ def cylinder_to_gaussian(d, t0, t1, radius, diag):
   return lift_gaussian(d, t_mean, t_var, r_var, diag)
 
 # TODO: Shift t0, t1 and then handle means, convs for before and after tc location
-def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
+def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldist=None):
   """Cast rays (cone- or cylinder-shaped) and featurize sections of it.
 
   Args:
@@ -138,14 +138,29 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True):
   """
   t0 = t_vals[..., :-1]
   t1 = t_vals[..., 1:]
+  
+  # Update t0, t1 
+  if focaldist is not None:
+    t0_ = jnp.abs(t0 - focaldist)
+    t1_ = jnp.abs(t1 - focaldist)
+    t0 = jnp.minimum(t0_, t1_)
+    t1 = jnp.maximum(t0_, t1_)
+
   if ray_shape == 'cone':
     gaussian_fn = conical_frustum_to_gaussian
   elif ray_shape == 'cylinder':
     gaussian_fn = cylinder_to_gaussian
   else:
     assert False
+  
   means, covs = gaussian_fn(directions, t0, t1, radii, diag)
-  means = means + origins[..., None, :]
+
+  #TODO: Review this implementation
+  if focaldist is not None:
+    means = means + origins[..., None, :] + directions[..., None, :] * focaldist[..., None]
+  else:
+    means = means + origins[..., None, :]
+
   return means, covs
 
 # Equation 10
@@ -224,9 +239,9 @@ def volumetric_rendering(rgb, density, t_vals, dirs, white_bkgd):
     comp_rgb = comp_rgb + (1. - acc[..., None])
   return comp_rgb, distance, acc, weights
 
-#TODO: Forward tc value to the cast_rays function
+#DONE: Forward tc value to the cast_rays function
 def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
-                      randomized, lindisp, ray_shape):
+                      randomized, lindisp, ray_shape, focaldist=None):
   """Stratified sampling along the rays.
 
   Args:
@@ -253,7 +268,7 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
     t_vals = 1. / (1. / near * (1. - t_vals) + 1. / far * t_vals)
   else:
     t_vals = near * (1. - t_vals) + far * t_vals
-
+  
   if randomized:
     mids = 0.5 * (t_vals[..., 1:] + t_vals[..., :-1])
     upper = jnp.concatenate([mids, t_vals[..., -1:]], -1)
@@ -263,12 +278,19 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
   else:
     # Broadcast t_vals to make the returned shape consistent.
     t_vals = jnp.broadcast_to(t_vals, [batch_size, num_samples + 1])
-  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape)
+
+  #Add focaldist to t_vals
+  if focaldist is not None:
+    focaldist = jnp.broadcast_to(focaldist,[batch_size, 1])
+    t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
+    t_vals = jnp.sort(t_vals, axis=1)
+
+  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist)
   return t_vals, (means, covs)
 
 
 def resample_along_rays(key, origins, directions, radii, t_vals, weights,
-                        randomized, ray_shape, stop_grad, resample_padding):
+                        randomized, ray_shape, stop_grad, resample_padding, focaldist=None):
   """Resampling.
 
   Args:
