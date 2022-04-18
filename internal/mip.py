@@ -143,6 +143,7 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   if focaldist is not None:
     t0_ = jnp.abs(t0 - focaldist)
     t1_ = jnp.abs(t1 - focaldist)
+    mask = jnp.sign(t1_ - t0_)
     t0 = jnp.minimum(t0_, t1_)
     t1 = jnp.maximum(t0_, t1_)
 
@@ -158,7 +159,7 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   #TODO: Review this implementation
   #TODO: Handle left and right cases
   if focaldist is not None:
-    means = means + origins[..., None, :] + directions[..., None, :] * focaldist[..., None]
+    means = means * mask + origins[..., None, :] + directions[..., None, :] * focaldist[..., None]
   else:
     means = means + origins[..., None, :]
 
