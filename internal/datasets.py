@@ -505,7 +505,7 @@ class FABlender(Dataset):
     ones = np.ones_like(self.origins[..., :1])
     self.rays = utils.Rays(
         origins=self.origins,
-        directions=self.directions, #NOTE:Should we pass directions or viewdirs?
+        directions=self.viewdirs, #NOTE:Should we pass directions or viewdirs?
         viewdirs=self.viewdirs,
         radii=self.radii, 
         focaldist=self.focal_dists,
