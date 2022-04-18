@@ -368,8 +368,9 @@ class FABlender(Dataset):
     focal_dists = []
     sensor_dists = []
     apertures = []
-    
-    self.focal_length = 0.05 # in meters (50mm) # TODO: Inside json
+
+    #NOTE: Verify blender data is fine..
+    self.focal_length = 0.050 # in meters (50mm) # TODO: Inside json
     self.near = None
     self.far = None
     self.sensor_size = 0.036 # TODO: Inside json
@@ -397,12 +398,14 @@ class FABlender(Dataset):
       y = np.arange(h)
 
       # Convert to range [-1, 1]
+      # NOTE: does x,y have to be W, H at the borders
       x = x / (w/2) - 1.0
       y = y / (h/2) - 1.0
 
       x *= self.sensor_size / 2 # Scale it to meters (world )
       y *= self.sensor_size / 2
 
+      # NOTE:check if the order of meshgrid output is consistent in _load_renderings and _generate_rays
       xy_grid = -np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
 
       xy_norm = np.linalg.norm(xy_grid, ord=2, axis=1)
@@ -459,6 +462,10 @@ class FABlender(Dataset):
 
     for i, sensor_dist in enumerate(self.sensor_dists):
 
+        #NOTE: check the order of meshgrid rays consistence
+        #NOTE: should the sensor_dist be +ve or -ve
+        #NOTE: Pass the camera_dirs through viz_rays function
+        #NOTE: Why -ve sign only on y direction
         camera_dirs = np.stack(
             [self.sensor_size * (x - self.w * 0.5 + 0.5) / self.w, 
             -self.sensor_size * (y - self.h * 0.5 + 0.5) / self.h, -sensor_dist * np.ones_like(x)],
@@ -498,9 +505,9 @@ class FABlender(Dataset):
     ones = np.ones_like(self.origins[..., :1])
     self.rays = utils.Rays(
         origins=self.origins,
-        directions=self.directions,
+        directions=self.directions, #NOTE:Should we pass directions or viewdirs?
         viewdirs=self.viewdirs,
-        radii=self.radii,
+        radii=self.radii, 
         focaldist=self.focal_dists,
         lossmult=ones,
         near=ones * self.near,
