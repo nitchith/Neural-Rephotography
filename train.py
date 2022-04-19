@@ -41,7 +41,7 @@ flags.DEFINE_integer('render_every', 5000,
                      'The number of steps between test set image renderings.')
 
 jax.config.parse_flags_with_absl()
-
+jax.config.update("jax_enable_x64", True)
 
 def train_step(model, config, rng, state, batch, lr):
   """One optimization step.
@@ -86,6 +86,7 @@ def train_step(model, config, rng, state, batch, lr):
     for (rgb, _, _) in ret:
       losses.append(
           (mask * (rgb - batch['pixels'][..., :3])**2).sum() / mask.sum())
+
     losses = jnp.array(losses)
 
     loss = (

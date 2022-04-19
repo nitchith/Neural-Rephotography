@@ -209,104 +209,6 @@ class Dataset(threading.Thread):
         near=ones * self.near,
         far=ones * self.far)
 
-class Multicam(Dataset):
-  """Multicam Dataset."""
-
-  def _load_renderings(self, config):
-    """Load images from disk."""
-    if config.render_path:
-      raise ValueError('render_path cannot be used for the Multicam dataset.')
-    with utils.open_file(path.join(self.data_dir, 'metadata.json'),
-                         'r') as fp:
-      self.meta = json.load(fp)[self.split]
-    self.meta = {k: np.array(self.meta[k]) for k in self.meta}
-    # should now have ['pix2cam', 'cam2world', 'width', 'height'] in self.meta
-    images = []
-    for fbase in self.meta['file_path']:
-      fname = os.path.join(self.data_dir, fbase)
-      with utils.open_file(fname, 'rb') as imgin:
-        image = np.array(Image.open(imgin), dtype=np.float32) / 255.
-      if config.white_bkgd:
-        image = image[..., :3] * image[..., -1:] + (1. - image[..., -1:])
-      images.append(image[..., :3])
-    self.images = images
-    self.n_examples = len(self.images)
-
-  def _train_init(self, config):
-    """Initialize training."""
-    self._load_renderings(config)
-    self._generate_rays()
-
-    def flatten(x):
-      # Always flatten out the height x width dimensions
-      x = [y.reshape([-1, y.shape[-1]]) for y in x]
-      if config.batching == 'all_images':
-        # If global batching, also concatenate all data into one list
-        x = np.concatenate(x, axis=0)
-      return x
-
-    self.images = flatten(self.images)
-    self.rays = utils.namedtuple_map(flatten, self.rays)
-
-  def _test_init(self, config):
-    self._load_renderings(config)
-    self._generate_rays()
-    self.it = 0
-
-  def _generate_rays(self):
-    """Generating rays for all images."""
-    pix2cam = self.meta['pix2cam']
-    cam2world = self.meta['cam2world']
-    width = self.meta['width']
-    height = self.meta['height']
-
-    def res2grid(w, h):
-      return np.meshgrid(  # pylint: disable=unbalanced-tuple-unpacking
-          np.arange(w, dtype=np.float32) + .5,  # X-Axis (columns)
-          np.arange(h, dtype=np.float32) + .5,  # Y-Axis (rows)
-          indexing='xy')
-
-    xy = [res2grid(w, h) for w, h in zip(width, height)]
-    pixel_dirs = [np.stack([x, y, np.ones_like(x)], axis=-1) for x, y in xy]
-    camera_dirs = [v @ p2c[:3, :3].T for v, p2c in zip(pixel_dirs, pix2cam)]
-    directions = [v @ c2w[:3, :3].T for v, c2w in zip(camera_dirs, cam2world)]
-    origins = [
-        np.broadcast_to(c2w[:3, -1], v.shape)
-        for v, c2w in zip(directions, cam2world)
-    ]
-    viewdirs = [
-        v / np.linalg.norm(v, axis=-1, keepdims=True) for v in directions
-    ]
-
-    def broadcast_scalar_attribute(x):
-      return [
-          np.broadcast_to(x[i], origins[i][..., :1].shape)
-          for i in range(self.n_examples)
-      ]
-
-    lossmult = broadcast_scalar_attribute(self.meta['lossmult'])
-    near = broadcast_scalar_attribute(self.meta['near'])
-    far = broadcast_scalar_attribute(self.meta['far'])
-
-    # Distance from each unit-norm direction vector to its x-axis neighbor.
-    dx = [
-        np.sqrt(np.sum((v[:-1, :, :] - v[1:, :, :])**2, -1)) for v in directions
-    ]
-    dx = [np.concatenate([v, v[-2:-1, :]], 0) for v in dx]
-    # Cut the distance in half, and then round it out so that it's
-    # halfway between inscribed by / circumscribed about the pixel.
-    radii = [v[..., None] * 2 / np.sqrt(12) for v in dx]
-
-    self.rays = utils.Rays(
-        origins=origins,
-        directions=directions,
-        viewdirs=viewdirs,
-        radii=radii,
-        lossmult=lossmult,
-        near=near,
-        far=far)
-
-
 class Blender(Dataset):
   """Blender Dataset."""
 
@@ -360,7 +262,7 @@ class FABlender(Dataset):
     if config.render_path:
       raise ValueError('render_path cannot be used for the blender dataset.')
     with utils.open_file(
-        path.join(self.data_dir, 'transforms.json'),
+        path.join(self.data_dir, 'transforms_{}.json'.format(self.split)),
         'r') as fp:
       meta = json.load(fp)
 
@@ -370,8 +272,6 @@ class FABlender(Dataset):
     apertures = []
     
     self.focal_length = 0.05 # in meters (50mm) # TODO: Inside json
-    self.near = None
-    self.far = None
     self.sensor_size = 0.036 # TODO: Inside json
 
     for i in range(len(meta['frames'])):
@@ -397,19 +297,19 @@ class FABlender(Dataset):
       y = np.arange(h)
 
       # Convert to range [-1, 1]
-      x = x / (w/2) - 1.0
-      y = y / (h/2) - 1.0
+      x = (x - w * 0.5 + 0.5) / (w/2) 
+      y = (y - h * 0.5 + 0.5) / (h/2)
 
-      x *= self.sensor_size / 2 # Scale it to meters (world )
-      y *= self.sensor_size / 2
+      x *= (self.sensor_size / 2) # Scale it to meters (world )
+      y *= (self.sensor_size / 2)
 
-      xy_grid = -np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
+      xy_grid = np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
 
       xy_norm = np.linalg.norm(xy_grid, ord=2, axis=1)
 
       xy_theta = np.arctan(xy_norm/sensor_dist)
 
-      xy_focal_dist = focal_dist * np.cos(xy_theta)
+      xy_focal_dist = focal_dist*np.cos(xy_theta)
 
       # theta = tan-1(norm((x,y))/sensor_dist)
       # focal_dist_pixel = focal_dist * cos (theta)
@@ -419,7 +319,7 @@ class FABlender(Dataset):
     self.images = np.stack(images, axis=0)
     self.apertures = np.stack(apertures, axis=0)
     self.sensor_dists = np.stack(sensor_dists, axis=0)
-    self.focal_dists = np.expand_dims(np.stack(focal_dists, axis=0), axis=-1)
+    self.focal_dists = np.expand_dims(np.stack(focal_dists, axis=0), axis=2)
 
     # Shapes
     # self.images  (220, 1024, 1024, 4)
@@ -428,11 +328,11 @@ class FABlender(Dataset):
     # self.focal_dists  (220, 1048576, 1)
 
     # TODO: Save near and far distances in json file
-    if self.near is None:
-        self.near = self.focal_dists.min() # 1
+    #if self.near is None:
+    self.near = self.focal_dists.min() - 0.5# 1
 
-    if self.far is None:
-        self.far = self.focal_dists.max() # 4
+    #if self.far is None:
+    self.far = self.focal_dists.max() + 0.5# 4
 
     if config.white_bkgd:
       self.images = (
@@ -460,8 +360,8 @@ class FABlender(Dataset):
     for i, sensor_dist in enumerate(self.sensor_dists):
 
         camera_dirs = np.stack(
-            [self.sensor_size * (x - self.w * 0.5 + 0.5) / self.w, 
-            -self.sensor_size * (y - self.h * 0.5 + 0.5) / self.h, -sensor_dist * np.ones_like(x)],
+            [(self.sensor_size/2) * (x - self.w * 0.5 + 0.5) / (self.w * 0.5), 
+            (self.sensor_size/2) * (y - self.h * 0.5 + 0.5) / (self.h * 0.5) , -sensor_dist * np.ones_like(x)],
             axis=-1)
 
         directions = camera_dirs
@@ -493,12 +393,12 @@ class FABlender(Dataset):
     # Shapes
     # self.origins  (220, 1024, 1024, 3)
     # self.directions  (220, 1024, 1024, 3)
-    # self.radii  (220, 1048576)
+    # self.radii  (220, 1024, 1024, 1)
 
     ones = np.ones_like(self.origins[..., :1])
     self.rays = utils.Rays(
         origins=self.origins,
-        directions=self.directions,
+        directions=self.viewdirs,
         viewdirs=self.viewdirs,
         radii=self.radii,
         focaldist=self.focal_dists,
@@ -509,6 +409,5 @@ class FABlender(Dataset):
 
 dataset_dict = {
     'blender': Blender,
-    'multicam': Multicam,
     'fablender': FABlender
 }

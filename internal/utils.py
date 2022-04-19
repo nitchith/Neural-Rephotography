@@ -81,8 +81,8 @@ class Config:
   test_render_interval: int = 1  # The interval between images saved to disk.
   disable_multiscale_loss: bool = False  # If True, disable multiscale loss.
   randomized: bool = True  # Use randomized stratified sampling.
-  near: float = 2.  # Near plane distance.
-  far: float = 6.  # Far plane distance.
+  near: float = 1.1  # Near plane distance.
+  far: float = 4  # Far plane distance.
   coarse_loss_mult: float = 0.1  # How much to downweight the coarse loss(es).
   weight_decay_mult: float = 0.  # The multiplier on weight decay.
   white_bkgd: bool = True  # If True, use white as the background (black o.w.).

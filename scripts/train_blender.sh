@@ -27,4 +27,4 @@ python -m train \
   --train_dir=$TRAIN_DIR \
   --gin_file=configs/fablender.gin \
   --logtostderr \
-  --gin_param="Config.batch_size=1024"
+  --gin_param="Config.batch_size=512"

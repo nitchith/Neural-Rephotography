@@ -25,16 +25,17 @@ import jax.numpy as jnp
 from internal import mip
 from internal import utils
 
+import pdb 
 
 @gin.configurable
 class MipNerfModel(nn.Module):
   """Nerf NN Model with both coarse and fine MLPs."""
   num_samples: int = 128  # The number of samples per level.
-  num_levels: int = 2  # The number of sampling levels.
+  num_levels: int = 1  # The number of sampling levels.
   resample_padding: float = 0.01  # Dirichlet/alpha "padding" on the histogram.
   stop_level_grad: bool = True  # If True, don't backprop across levels')
   use_viewdirs: bool = True  # If True, use view directions as a condition.
-  lindisp: bool = False  # If True, sample linearly in disparity, not in depth.
+  lindisp: bool = True  # If True, sample linearly in disparity, not in depth.
   ray_shape: str = 'cone'  # The shape of cast rays ('cone' or 'cylinder').
   min_deg_point: int = 0  # Min degree of positional encoding for 3D points.
   max_deg_point: int = 16  # Max degree of positional encoding for 3D points.
@@ -103,6 +104,7 @@ class MipNerfModel(nn.Module):
       #TODO: Pass tc information
       if i_level == 0:
       # Stratified sampling along rays
+        #pdb.set_trace()
         t_vals, samples = mip.sample_along_rays(
             key,
             rays.origins,
@@ -277,7 +279,7 @@ def render_image(render_fn, rays, rng, chunk=8192):
   num_rays = height * width
   rays = utils.namedtuple_map(lambda r: r.reshape((num_rays, -1)), rays)
 
-  host_id = jax.host_id()
+  host_id = jax.process_index()
   results = []
   for i in range(0, num_rays, chunk):
     # pylint: disable=cell-var-from-loop
