@@ -1,0 +1,648 @@
+{
+    "camera_angle_x": 0.6911112070083618,
+    "frames": [
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0000",
+            "focus": 1.2,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0002",
+            "focus": 1.3894736842105262,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0004",
+            "focus": 1.5789473684210527,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0006",
+            "focus": 1.768421052631579,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0008",
+            "focus": 1.9578947368421051,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0010",
+            "focus": 2.1473684210526316,
+            "fstop": 1.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0012",
+            "focus": 2.336842105263158,
+            "fstop": 1.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0014",
+            "focus": 2.526315789473684,
+            "fstop": 1.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0016",
+            "focus": 2.7157894736842105,
+            "fstop": 1.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0018",
+            "focus": 2.905263157894737,
+            "fstop": 1.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0021",
+            "focus": 1.2947368421052632,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0023",
+            "focus": 1.4842105263157894,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0025",
+            "focus": 1.6736842105263157,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0027",
+            "focus": 1.8631578947368421,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0029",
+            "focus": 2.052631578947368,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0031",
+            "focus": 2.242105263157895,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0033",
+            "focus": 2.431578947368421,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0035",
+            "focus": 2.621052631578947,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0037",
+            "focus": 2.810526315789474,
+            "fstop": 2.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0039",
+            "focus": 3.0,
+            "fstop": 2.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0040",
+            "focus": 1.2,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0042",
+            "focus": 1.3894736842105262,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0044",
+            "focus": 1.5789473684210527,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0046",
+            "focus": 1.768421052631579,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0048",
+            "focus": 1.9578947368421051,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0050",
+            "focus": 2.1473684210526316,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0052",
+            "focus": 2.336842105263158,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0054",
+            "focus": 2.526315789473684,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0056",
+            "focus": 2.7157894736842105,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0058",
+            "focus": 2.905263157894737,
+            "fstop": 3.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0061",
+            "focus": 1.2947368421052632,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0063",
+            "focus": 1.4842105263157894,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0065",
+            "focus": 1.6736842105263157,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0067",
+            "focus": 1.8631578947368421,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0069",
+            "focus": 2.052631578947368,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0071",
+            "focus": 2.242105263157895,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0073",
+            "focus": 2.431578947368421,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0075",
+            "focus": 2.621052631578947,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0077",
+            "focus": 2.810526315789474,
+            "fstop": 4.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0079",
+            "focus": 3.0,
+            "fstop": 4.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0080",
+            "focus": 1.2,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0082",
+            "focus": 1.3894736842105262,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0084",
+            "focus": 1.5789473684210527,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0086",
+            "focus": 1.768421052631579,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0088",
+            "focus": 1.9578947368421051,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0090",
+            "focus": 2.1473684210526316,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0092",
+            "focus": 2.336842105263158,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0094",
+            "focus": 2.526315789473684,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0096",
+            "focus": 2.7157894736842105,
+            "fstop": 5.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0098",
+            "focus": 2.905263157894737,
+            "fstop": 5.0
+        },
+
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0101",
+            "focus": 1.2947368421052632,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0103",
+            "focus": 1.4842105263157894,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0105",
+            "focus": 1.6736842105263157,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0107",
+            "focus": 1.8631578947368421,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0109",
+            "focus": 2.052631578947368,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0111",
+            "focus": 2.242105263157895,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0113",
+            "focus": 2.431578947368421,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0115",
+            "focus": 2.621052631578947,
+            "fstop": 6.0
+        },
+ 
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0117",
+            "focus": 2.810526315789474,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0119",
+            "focus": 3.0,
+            "fstop": 6.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0122",
+            "focus": 1.3894736842105262,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0124",
+            "focus": 1.5789473684210527,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0126",
+            "focus": 1.768421052631579,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0128",
+            "focus": 1.9578947368421051,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0130",
+            "focus": 2.1473684210526316,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0132",
+            "focus": 2.336842105263158,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0134",
+            "focus": 2.526315789473684,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0136",
+            "focus": 2.7157894736842105,
+            "fstop": 7.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0138",
+            "focus": 2.905263157894737,
+            "fstop": 7.0
+        },
+
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0141",
+            "focus": 1.2947368421052632,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0143",
+            "focus": 1.4842105263157894,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0145",
+            "focus": 1.6736842105263157,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0147",
+            "focus": 1.8631578947368421,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0149",
+            "focus": 2.052631578947368,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0151",
+            "focus": 2.242105263157895,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0153",
+            "focus": 2.431578947368421,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0155",
+            "focus": 2.621052631578947,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0157",
+            "focus": 2.810526315789474,
+            "fstop": 8.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0159",
+            "focus": 3.0,
+            "fstop": 8.0
+        },
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0160",
+            "focus": 1.2,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0162",
+            "focus": 1.3894736842105262,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0164",
+            "focus": 1.5789473684210527,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0166",
+            "focus": 1.768421052631579,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0168",
+            "focus": 1.9578947368421051,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0170",
+            "focus": 2.1473684210526316,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0172",
+            "focus": 2.336842105263158,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0174",
+            "focus": 2.526315789473684,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0176",
+            "focus": 2.7157894736842105,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0178",
+            "focus": 2.905263157894737,
+            "fstop": 9.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0181",
+            "focus": 1.2947368421052632,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0183",
+            "focus": 1.4842105263157894,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0185",
+            "focus": 1.6736842105263157,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0187",
+            "focus": 1.8631578947368421,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0189",
+            "focus": 2.052631578947368,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0191",
+            "focus": 2.242105263157895,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0193",
+            "focus": 2.431578947368421,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0195",
+            "focus": 2.621052631578947,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0197",
+            "focus": 2.810526315789474,
+            "fstop": 10.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0199",
+            "focus": 3.0,
+            "fstop": 10.0
+        },
+
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0202",
+            "focus": 1.3894736842105262,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0204",
+            "focus": 1.5789473684210527,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0206",
+            "focus": 1.768421052631579,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0208",
+            "focus": 1.9578947368421051,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0210",
+            "focus": 2.1473684210526316,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0212",
+            "focus": 2.336842105263158,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0214",
+            "focus": 2.526315789473684,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0216",
+            "focus": 2.7157894736842105,
+            "fstop": 11.0
+        },
+
+        {
+            "file_path": "/home/nboloor/neha/3D_project/dataset/results_lego_scaled/0218",
+            "focus": 2.905263157894737,
+            "fstop": 11.0
+        }
+    ],
+    "num_fstop": 11,
+    "num_focus": 20
+}
