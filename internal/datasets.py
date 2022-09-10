@@ -268,11 +268,13 @@ class FABlender(Dataset):
 
     images = []
     focal_dists = []
+    foc_dist_center = []
     sensor_dists = []
     apertures = []
     
-    self.focal_length = 0.05 # in meters (50mm) # TODO: Inside json
     self.sensor_size = 0.036 # TODO: Inside json
+    #self.scale = 1024/self.sensor_size
+    self.focal_length = 0.05 # in meters (50mm) # TODO: Inside json
 
     for i in range(len(meta['frames'])):
       frame = meta['frames'][i]
@@ -288,9 +290,9 @@ class FABlender(Dataset):
       apertures.append(aperture)
 
       # Get focal and sensor distance (u-focal, v-sensor)
-      focal_dist = frame['focus']
+      focal_dist = frame['focus'] 
       sensor_dist = (focal_dist * self.focal_length) / (focal_dist - self.focal_length) # in meters
-      
+      #sensor_dist *= self.scale 
       w,h,d = image.shape
 
       x = np.arange(w)
@@ -309,16 +311,18 @@ class FABlender(Dataset):
 
       xy_theta = np.arctan(xy_norm/sensor_dist)
 
-      xy_focal_dist = focal_dist*np.cos(xy_theta)
+      xy_focal_dist = focal_dist / np.cos(xy_theta)
 
       # theta = tan-1(norm((x,y))/sensor_dist)
-      # focal_dist_pixel = focal_dist * cos (theta)
-      focal_dists.append(xy_focal_dist)
+      # focal_dist_pixel = focal_dist / cos (theta)
+      focal_dists.append(focal_dist * np.ones_like(xy_focal_dist))
+      foc_dist_center.append(focal_dist)
       sensor_dists.append(sensor_dist)
 
     self.images = np.stack(images, axis=0)
     self.apertures = np.stack(apertures, axis=0)
     self.sensor_dists = np.stack(sensor_dists, axis=0)
+    self.foc_dist_center = np.stack(foc_dist_center, axis=0)
     self.focal_dists = np.expand_dims(np.stack(focal_dists, axis=0), axis=2)
 
     # Shapes
@@ -329,17 +333,16 @@ class FABlender(Dataset):
 
     # TODO: Save near and far distances in json file
     #if self.near is None:
-    self.near = self.focal_dists.min() - 0.5# 1
+    self.near = 0.8 #self.focal_dists.min() - 0.5 # 1.2
 
     #if self.far is None:
-    self.far = self.focal_dists.max() + 0.5# 4
+    self.far = 3.6 #self.focal_dists.max() + 1 # 3
 
     if config.white_bkgd:
       self.images = (
-          self.images[..., :3] * self.images[..., -1:] +
-          (1. - self.images[..., -1:]))
+          self.images[..., :3] * self.images[..., -1:]) + (1. - self.images[..., -1:])
     else:
-      self.images = self.images[..., :3]
+      self.images = self.images[..., :3] * self.images[..., -1:]
 
     self.h, self.w = self.images.shape[1:3]
     self.resolution = self.h * self.w
@@ -360,35 +363,38 @@ class FABlender(Dataset):
     for i, sensor_dist in enumerate(self.sensor_dists):
 
         camera_dirs = np.stack(
-            [(self.sensor_size/2) * (x - self.w * 0.5 + 0.5) / (self.w * 0.5), 
-            (self.sensor_size/2) * (y - self.h * 0.5 + 0.5) / (self.h * 0.5) , -sensor_dist * np.ones_like(x)],
+            [(self.sensor_size / 2)*(x - self.w * 0.5 + 0.5) / (self.w/2), 
+            -(self.sensor_size / 2)*(y - self.h * 0.5 + 0.5) / (self.h/2), 0.0515 * np.ones_like(x)],
             axis=-1)
 
-        directions = camera_dirs
+        directions = (1/0.0515) * camera_dirs
 
         self.directions.append(directions)
 
-        origins = np.broadcast_to(np.zeros((3)), directions.shape)
+        origins = np.broadcast_to(np.array([0, 0, 0]), directions.shape)
         self.origins.append(origins)
 
-        self.radii.append(self.apertures[i]/self.focal_dists[i])
-        #print("dirs", directions.shape)
-        #print("origins", origins.shape)
-        #print("radii", self.radii[-1].shape)
+
+        # Note: [radii = aperture / focus_dist] Not valid for off-center pixels
+        #xy_theta = self.foc_dist_center[i]/self.focal_dists[i]
+        #xy_aperture = self.apertures[i] / xy_theta
+        #self.radii.append(xy_aperture / self.focal_dists[i])
+        self.radii.append(self.apertures[i] / self.focal_dists[i])
        
 
         # Distance from each unit-norm direction vector to its x-axis neighbor.
-        # dx = np.sqrt(np.sum((directions[:, :-1, :, :] - directions[:, 1:, :, :])**2, -1))
-
-        # dx = np.concatenate([dx, dx[:, -2:-1, :]], 1)
+        #dx = np.sqrt(np.sum((directions[:, :-1, :] - directions[:, 1:, :])**2, -1)) # (1024, 1023)
+        #dx = np.concatenate([dx, dx[:, -2:-1]], 1) # (1024, 1024)
+        #radii = dx[..., None] * 2 / np.sqrt(12)
+        #self.radii.append(radii)
         # Cut the distance in half, and then round it out so that it's
         # halfway between inscribed by / circumscribed about the pixel.
 
 
     self.origins = np.stack(self.origins, axis=0)
     self.directions = np.stack(self.directions, axis=0)
-    self.radii = np.stack(self.radii, axis=0).reshape((-1, self.h, self.w, 1))
     self.viewdirs = self.directions / np.linalg.norm(self.directions, axis=-1, keepdims=True)
+    self.radii = np.stack(self.radii, axis=0).reshape((-1, self.h, self.w, 1))
 
     # Shapes
     # self.origins  (220, 1024, 1024, 3)
@@ -398,7 +404,7 @@ class FABlender(Dataset):
     ones = np.ones_like(self.origins[..., :1])
     self.rays = utils.Rays(
         origins=self.origins,
-        directions=self.viewdirs,
+        directions=self.directions,
         viewdirs=self.viewdirs,
         radii=self.radii,
         focaldist=self.focal_dists,

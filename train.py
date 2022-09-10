@@ -79,8 +79,8 @@ def train_step(model, config, rng, state, batch, lr):
         white_bkgd=config.white_bkgd)
 
     mask = batch['rays'].lossmult
-    if config.disable_multiscale_loss:
-      mask = jnp.ones_like(mask)
+    #if config.disable_multiscale_loss:
+    mask = jnp.ones_like(mask)
 
     losses = []
     for (rgb, _, _) in ret:

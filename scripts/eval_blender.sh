@@ -15,7 +15,7 @@
 
 # Script for evaluating on the Blender dataset.
 
-SCENE=lego
+SCENE=lego_no_gauss
 EXPERIMENT=debug
 TRAIN_DIR=/home/rohanc/capstone/NeReFocus/tmp/$SCENE/
 DATA_DIR=/home/rohanc/capstone/blender_dataset/results_lego_scaled/

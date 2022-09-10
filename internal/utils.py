@@ -80,12 +80,12 @@ class Config:
   gc_every: int = 10000  # The number of steps between garbage collections.
   test_render_interval: int = 1  # The interval between images saved to disk.
   disable_multiscale_loss: bool = False  # If True, disable multiscale loss.
-  randomized: bool = True  # Use randomized stratified sampling.
+  randomized: bool = False  # Use randomized stratified sampling.
   near: float = 1.1  # Near plane distance.
-  far: float = 4  # Far plane distance.
-  coarse_loss_mult: float = 0.1  # How much to downweight the coarse loss(es).
+  far: float = 5.  # Far plane distance.
+  coarse_loss_mult: float = 1  # How much to downweight the coarse loss(es).
   weight_decay_mult: float = 0.  # The multiplier on weight decay.
-  white_bkgd: bool = True  # If True, use white as the background (black o.w.).
+  white_bkgd: bool = True # If True, use white as the background (black o.w.).
 
 
 def define_common_flags():

@@ -18,7 +18,6 @@
 SCENE=lego
 EXPERIMENT=debug
 TRAIN_DIR=/home/rohanc/capstone/NeReFocus/tmp/$SCENE/
-#DATA_DIR=/home/srinitca/capstone/dataset/nerf_synthetic/$SCENE/
 DATA_DIR=/home/rohanc/capstone/blender_dataset/results_lego_scaled/
 
 #rm -rf $TRAIN_DIR/
@@ -27,4 +26,4 @@ python -m train \
   --train_dir=$TRAIN_DIR \
   --gin_file=configs/fablender.gin \
   --logtostderr \
-  --gin_param="Config.batch_size=512"
+  --gin_param="Config.batch_size=1024"

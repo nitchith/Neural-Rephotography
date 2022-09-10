@@ -68,7 +68,7 @@ def lift_gaussian(d, t_mean, t_var, r_var, diag):
     return mean, cov
 
 # Equation 7
-def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, mask, stable=True):
+def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, mask, focaldist, stable=True):
   """Approximate a conical frustum as a Gaussian distribution (mean+cov).
 
   Assumes the ray is originating from the origin, and base_radius is the
@@ -86,6 +86,9 @@ def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, mask, stable=True)
   Returns:
     a Gaussian (mean and covariance).
   """
+
+  #t0 += focaldist
+  #t1 += focaldist
   if stable:
     mu = (t0 + t1) / 2
     hw = (t1 - t0) / 2
@@ -99,9 +102,16 @@ def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, mask, stable=True)
     r_var = base_radius**2 * (3 / 20 * (t1**5 - t0**5) / (t1**3 - t0**3))
     t_mosq = 3 / 5 * (t1**5 - t0**5) / (t1**3 - t0**3)
     t_var = t_mosq - t_mean**2
-  
-  t_mean *= mask
+
+  t_mean = t_mean + focaldist
+
+  # lift t1, t2 to 3D
+  #t0 = d[..., None, :] *  t0[..., None]
+  #t1 = d[..., None, :] *  t1[..., None]
+
   return lift_gaussian(d, t_mean, t_var, r_var, diag)
+  #print(t0.shape, t1.shape)
+  #return jnp.concatenate((t0, t1), axis=1)
 
 
 def cylinder_to_gaussian(d, t0, t1, radius, diag):
@@ -141,6 +151,8 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
     a tuple of arrays of means and covariances.
   """
 
+  #assert focaldist.shape[0] == t_vals.shape[0] and focaldist.shape[1] == 1
+
   t_vals_ = t_vals - focaldist
   t0 = t_vals_[..., :-1]
   t1 = t_vals_[..., 1:]
@@ -150,10 +162,12 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   if focaldist is not None:
     t0_ = jnp.abs(t0)
     t1_ = jnp.abs(t1)
-    mask = jnp.expand_dims(jnp.sign(t1_ - t0_), axis=2)
+    mask = jnp.sign(t1_ - t0_)
     #mask = jnp.repeat(mask, 3, axis=2)
-    t0 = jnp.minimum(t0_, t1_)
-    t1 = jnp.maximum(t0_, t1_)
+    t0 = mask * jnp.minimum(t0_, t1_)
+    t1 = mask * jnp.maximum(t0_, t1_)
+    t0 = t0 + focaldist
+    t1 = t1 + focaldist
 
 
   if ray_shape == 'cone':
@@ -163,7 +177,7 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   else:
     assert False
   
-  means, covs = gaussian_fn(directions, t0, t1, radii, diag, mask=jnp.sign(t1_ - t0_))
+  means, covs = gaussian_fn(directions, t0, t1, radii, diag, mask=mask,focaldist=focaldist)
 
   #TODO: Review this implementation
   if focaldist is not None:
@@ -175,17 +189,26 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
     #mask_ = mask_ * (mask * jnp.expand_dims(jnp.repeat(focaldist,means.shape[1],axis=1),axis=2))
 
     #means = means * mask_ + jnp.expand_dims(jnp.repeat(focaldist,means.shape[1],axis=1),axis=2)  #directions[..., None, :] * focaldist[..., None]
-    means = means + directions[..., None, :] * focaldist[..., None]
+    #means = means + directions[..., None, :] * focaldist[..., None]
+    #means = means + focaldist[..., None]
 
     #R = jnp.diag(jnp.array([-1, 1, -1]))
     
     #covs = jnp.tensordot(np.tensordot(R, covs, axes=([1], [2])).T, R.T, axes=([2], [1]))
     #cov_mask = jnp.concatenate((ones, ones, mask), axis=2)
     #covs = covs * cov_mask
+
+    #means =  directions[..., None, :] * jnp.concatenate((t0, t1), axis=2)[..., None]
+    #means = means + origins[..., None, :]
+
+    t0 = directions[..., None, :] * t0[..., None] + origins[..., None, :]
+    t1 = directions[..., None, :] * t1[..., None] + origins[..., None, :]
+    ts = jnp.concatenate((t0, t1), axis=-1) #(B, N, 2, 3)
   else:
     means = means + origins[..., None, :]
 
-  return means, covs
+  #return means, covs
+  return ts
 
 # Equation 10
 def integrated_pos_enc(x_coord, min_deg, max_deg, diag=True):
@@ -304,13 +327,16 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
     t_vals = jnp.broadcast_to(t_vals, [batch_size, num_samples + 1])
 
   #Add focaldist to t_vals
-  if focaldist is not None:
-    focaldist = jnp.broadcast_to(focaldist,[batch_size, 1])
-    t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
-    t_vals = jnp.sort(t_vals, axis=1)
+  #if focaldist is not None:
+  focaldist = jnp.broadcast_to(focaldist,[batch_size, 1])
+  t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
+  t_vals = jnp.sort(t_vals, axis=1)
 
-  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
-  return t_vals, (means, covs)
+  #means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
+  means = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
+
+  #return t_vals, (means, covs)
+  return t_vals, (means,)
 
 
 def resample_along_rays(key, origins, directions, radii, t_vals, weights,
@@ -362,5 +388,6 @@ def resample_along_rays(key, origins, directions, radii, t_vals, weights,
 
   if stop_grad:
     new_t_vals = lax.stop_gradient(new_t_vals)
-  means, covs = cast_rays(new_t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
-  return new_t_vals, (means, covs)
+  means = cast_rays(new_t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
+  #return new_t_vals, (means, covs)
+  return new_t_vals, (means,)
