@@ -309,7 +309,7 @@ class FABlender(Dataset):
 
       xy_theta = np.arctan(xy_norm/sensor_dist)
 
-      xy_focal_dist = focal_dist*np.cos(xy_theta)
+      xy_focal_dist = focal_dist / np.cos(xy_theta)
 
       # theta = tan-1(norm((x,y))/sensor_dist)
       # focal_dist_pixel = focal_dist * cos (theta)
@@ -361,7 +361,7 @@ class FABlender(Dataset):
 
         camera_dirs = np.stack(
             [(self.sensor_size/2) * (x - self.w * 0.5 + 0.5) / (self.w * 0.5), 
-            (self.sensor_size/2) * (y - self.h * 0.5 + 0.5) / (self.h * 0.5) , -sensor_dist * np.ones_like(x)],
+            -(self.sensor_size/2) * (y - self.h * 0.5 + 0.5) / (self.h * 0.5) , -sensor_dist * np.ones_like(x)],
             axis=-1)
 
         directions = camera_dirs

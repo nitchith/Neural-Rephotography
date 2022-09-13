@@ -31,11 +31,11 @@ import pdb
 class MipNerfModel(nn.Module):
   """Nerf NN Model with both coarse and fine MLPs."""
   num_samples: int = 128  # The number of samples per level.
-  num_levels: int = 1  # The number of sampling levels.
+  num_levels: int = 2  # The number of sampling levels.
   resample_padding: float = 0.01  # Dirichlet/alpha "padding" on the histogram.
   stop_level_grad: bool = True  # If True, don't backprop across levels')
   use_viewdirs: bool = True  # If True, use view directions as a condition.
-  lindisp: bool = True  # If True, sample linearly in disparity, not in depth.
+  lindisp: bool = False  # If True, sample linearly in disparity, not in depth.
   ray_shape: str = 'cone'  # The shape of cast rays ('cone' or 'cylinder').
   min_deg_point: int = 0  # Min degree of positional encoding for 3D points.
   max_deg_point: int = 16  # Max degree of positional encoding for 3D points.
@@ -46,40 +46,6 @@ class MipNerfModel(nn.Module):
   rgb_activation: Callable[..., Any] = nn.sigmoid  # The RGB activation.
   rgb_padding: float = 0.001  # Padding added to the RGB outputs.
   disable_integration: bool = False  # If True, use PE instead of IPE.
-
-  # @nn.compact
-  # def get_tvals_samples(self, i_level, rays, key, randomized, weights, focaldist, tvals=None):
-  #   if i_level == 0:
-  #       # Stratified sampling along rays
-  #       #TODO: Pass tc information
-  #       t_vals, samples = mip.sample_along_rays(
-  #           key,
-  #           rays.origins,
-  #           rays.directions,
-  #           rays.radii,
-  #           self.num_samples,
-  #           rays.near,
-  #           rays.far,
-  #           randomized,
-  #           self.lindisp,
-  #           self.ray_shape,
-  #           rays.focaldist
-  #       )
-  #   else:
-  #       t_vals, samples = mip.resample_along_rays(
-  #           key,
-  #           rays.origins,
-  #           rays.directions,
-  #           rays.radii,
-  #           t_vals,
-  #           weights,
-  #           randomized,
-  #           self.ray_shape,
-  #           self.stop_level_grad,
-  #           resample_padding=self.resample_padding,
-  #           focaldist = rays.focaldist
-  #       )
-  #   return t_vals, samples
 
   @nn.compact
   def __call__(self, rng, rays, randomized, white_bkgd):

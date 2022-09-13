@@ -156,6 +156,7 @@ def main(unused_argv):
   if config.batch_size % jax.device_count() != 0:
     raise ValueError('Batch size must be divisible by the number of devices.')
 
+  # Read dataset
   dataset = datasets.get_dataset('train', FLAGS.data_dir, config)
   test_dataset = datasets.get_dataset('test', FLAGS.data_dir, config)
 

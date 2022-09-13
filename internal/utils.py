@@ -75,7 +75,7 @@ class Config:
   grad_max_norm: float = 0.  # Gradient clipping magnitude, disabled if == 0.
   grad_max_val: float = 0.  # Gradient clipping value, disabled if == 0.
   max_steps: int = 1000000  # The number of optimization steps.
-  save_every: int = 100000  # The number of steps to save a checkpoint.
+  save_every: int = 5000  # The number of steps to save a checkpoint.
   print_every: int = 100  # The number of steps between reports to tensorboard.
   gc_every: int = 10000  # The number of steps between garbage collections.
   test_render_interval: int = 1  # The interval between images saved to disk.

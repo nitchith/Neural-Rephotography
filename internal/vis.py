@@ -44,8 +44,8 @@ def depth_to_normals(depth):
 
 def visualize_depth(depth,
                     acc=None,
-                    near=None,
-                    far=None,
+                    near=1.1,
+                    far=4,
                     ignore_frac=0,
                     curve_fn=lambda x: -jnp.log(x + jnp.finfo(jnp.float32).eps),
                     modulus=0,

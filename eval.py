@@ -40,7 +40,7 @@ flags.DEFINE_bool(
     'checkpoints if any exist.')
 flags.DEFINE_bool('save_output', True,
                   'If True, save predicted images to disk.')
-
+jax.config.update("jax_enable_x64", True)
 
 def main(unused_argv):
   config = utils.load_config()
