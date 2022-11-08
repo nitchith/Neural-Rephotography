@@ -250,6 +250,134 @@ class Blender(Dataset):
     self.focal = .5 * self.w / np.tan(.5 * camera_angle_x)
     self.n_examples = self.images.shape[0]
 
+def compute_aperture(fstop, focus, sensor_dist):
+    # f of lens
+    focal_length = (focus * sensor_dist) / (focus + sensor_dist)
+    aperture = focal_length / (2 * fstop)
+    return aperture
+
+class DefocusBlender(Dataset):
+  """Blender Dataset."""
+
+  def _load_renderings(self, config):
+    """Load images from disk."""
+    if config.render_path:
+      raise ValueError('render_path cannot be used for the blender dataset.')
+    with utils.open_file(
+        path.join(self.data_dir, 'transforms_{}.json'.format(self.split)),
+        'r') as fp:
+      meta = json.load(fp)
+      assert "sensor_size" in meta
+      assert "sensor_dist" in meta
+      assert "near" in meta
+      assert "far" in meta
+
+    self.sensor_dist = float(meta['sensor_dist'])
+    self.sensor_size = float(meta['sensor_size'])
+    self.near = float(meta['near'])
+    self.far = float(meta['far'])
+
+    images = []
+    cams = []
+    focus_data = []
+    fstop_data = []
+    aperture_data = []
+    pixel_focus_dist_data = []
+    radii_data = []
+
+    if config.factor > 0:
+      raise ValueError('Defocus Blender dataset only supports factor=0, {} '
+                           'set.'.format(config.factor))
+
+    for i in range(len(meta['frames'])):
+      frame = meta['frames'][i]
+      fname = os.path.join(self.data_dir, frame['file_path'] + '.png')
+      with utils.open_file(fname, 'rb') as imgin:
+        image = np.array(Image.open(imgin), dtype=np.float32) / 255.
+      cams.append(np.array(frame['transform_matrix'], dtype=np.float32))
+      images.append(image)
+      focus_data.append(frame["focus"])
+      fstop_data.append(frame["fstop"])
+      aperture = compute_aperture(frame["fstop"], frame["focus"], self.sensor_dist)
+      aperture_data.append(aperture)
+
+      # Compute per pixel focus distance from the focal plane through lens center
+      w,h,d = image.shape
+      x = np.arange(w)
+      y = np.arange(h)
+
+      # Convert to range [-1, 1]
+      x = (x - w * 0.5 + 0.5) / (w/2) 
+      y = (y - h * 0.5 + 0.5) / (h/2)
+      x *= (self.sensor_size / 2) # Scale it to meters (world )
+      y *= (self.sensor_size / 2)
+
+      xy_grid = np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
+      xy_norm = np.linalg.norm(xy_grid, ord=2, axis=1)
+      xy_theta = np.arctan(xy_norm/self.sensor_dist)
+      xy_focal_dist = frame["focus"] / np.cos(xy_theta)
+
+      if config.defocus_radius == "same":
+        radii = (aperture / frame["focus"]) * np.ones_like(xy_focal_dist)
+      elif config.defocus_radius == "scaled":
+        radii = aperture/xy_focal_dist
+      else:
+        raise ValueError("defocus_radius : {config.defocus_radius} not supported")
+
+      pixel_focus_dist_data.append(xy_focal_dist)
+      radii_data.append(radii)
+
+    self.images = np.stack(images, axis=0)
+    self.focus_data = np.array(focus_data)
+    self.fstop_data = np.array(fstop_data)
+    self.aperture_data = np.array(aperture_data)
+    self.radii_data = np.stack(radii_data, axis=0)
+    self.pixel_focus_dist_data = np.stack(pixel_focus_dist_data, axis=0)
+
+    if config.white_bkgd:
+      self.images = (
+          self.images[..., :3] * self.images[..., -1:] +
+          (1. - self.images[..., -1:]))
+    else:
+      self.images = self.images[..., :3]
+
+    self.h, self.w = self.images.shape[1:3]
+    self.resolution = self.h * self.w
+    self.camtoworlds = np.stack(cams, axis=0)
+    camera_angle_x = float(meta['camera_angle_x'])
+    self.focal = .5 * self.w / np.tan(.5 * camera_angle_x)
+    self.n_examples = self.images.shape[0]
+
+  def _generate_rays(self):
+    """Generating rays for all images."""
+    x, y = np.meshgrid(  # pylint: disable=unbalanced-tuple-unpacking
+        np.arange(self.w, dtype=np.float32),  # X-Axis (columns)
+        np.arange(self.h, dtype=np.float32),  # Y-Axis (rows)
+        indexing='xy')
+    camera_dirs = np.stack(
+        [(x - self.w * 0.5 + 0.5) / self.focal,
+         -(y - self.h * 0.5 + 0.5) / self.focal, -np.ones_like(x)],
+        axis=-1)
+    directions = ((camera_dirs[None, ..., None, :] *
+                   self.camtoworlds[:, None, None, :3, :3]).sum(axis=-1))
+    origins = np.broadcast_to(self.camtoworlds[:, None, None, :3, -1],
+                              directions.shape)
+    viewdirs = directions / np.linalg.norm(directions, axis=-1, keepdims=True)
+
+    # Compute radii and focus dist per pixel
+    radii = self.radii_data.reshape((-1, self.h, self.w, 1))
+    focus_dist = np.expand_dims(self.pixel_focus_dist_data, axis=2)
+
+    ones = np.ones_like(origins[..., :1])
+    self.rays = utils.Rays(
+        origins=origins,
+        directions=directions,
+        viewdirs=viewdirs,
+        radii=radii,
+        focaldist=focus_dist,
+        lossmult=ones,
+        near=ones * self.near,
+        far=ones * self.far)
 
 
 class FABlender(Dataset):
@@ -304,11 +432,8 @@ class FABlender(Dataset):
       y *= (self.sensor_size / 2)
 
       xy_grid = np.stack(tuple(reversed(np.meshgrid(y,x))), axis=-1).reshape((w*h, 2))
-
       xy_norm = np.linalg.norm(xy_grid, ord=2, axis=1)
-
       xy_theta = np.arctan(xy_norm/sensor_dist)
-
       xy_focal_dist = focal_dist / np.cos(xy_theta)
 
       # theta = tan-1(norm((x,y))/sensor_dist)
@@ -409,5 +534,6 @@ class FABlender(Dataset):
 
 dataset_dict = {
     'blender': Blender,
-    'fablender': FABlender
+    'fablender': FABlender,
+    'defocusblender': DefocusBlender,
 }

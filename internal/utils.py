@@ -86,7 +86,7 @@ class Config:
   coarse_loss_mult: float = 0.1  # How much to downweight the coarse loss(es).
   weight_decay_mult: float = 0.  # The multiplier on weight decay.
   white_bkgd: bool = True  # If True, use white as the background (black o.w.).
-
+  defocus_radius: str = "same" # same: Use same radius for all pixels
 
 def define_common_flags():
   # Define the flags used by both train.py and eval.py
