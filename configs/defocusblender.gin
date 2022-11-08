@@ -1,0 +1,2 @@
+Config.dataset_loader = 'defocusblender'
+Config.batching = 'single_image'

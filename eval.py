@@ -76,7 +76,7 @@ def main(unused_argv):
 
   last_step = 0
   out_dir = path.join(FLAGS.train_dir,
-                      'path_renders' if config.render_path else 'test_preds')
+                      'path_renders' if config.render_path else FLAGS.save_dir)
   if not FLAGS.eval_once:
     summary_writer = tensorboard.SummaryWriter(
         path.join(FLAGS.train_dir, 'eval'))

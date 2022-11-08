@@ -13,25 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Script for training on the Blender dataset.
+# Script for evaluating on the Blender dataset.
 
 SCENE=lego
-# EXPERIMENT=train_4stacks
-# DATA_DIR=/home/srinitca/capstone/nerf-pytorch/data/nerf_newdataset_4stack/
-
-EXPERIMENT=train_1stacks
-DATA_DIR=/home/srinitca/capstone/nerf-pytorch/data/nerf_newdataset_1stack/
+EXPERIMENT=train_4stacks
+TRAIN_DIR=/home/srinitca/capstone/NeReFocus/tmp_defocus_results/$EXPERIMENT/$SCENE
+# DATA_DIR=/home/rohanc/capstone/blender_dataset/results_lego_scaled/
+# DATA_DIR=/home/srinitca/capstone/nerf-pytorch/data/nerf_render/
 # DATA_DIR=/home/srinitca/capstone/nerf-pytorch/data/nerf_newview/
 
-TRAIN_DIR=/home/srinitca/capstone/NeReFocus/tmp_defocus_results/$EXPERIMENT/$SCENE
-#DATA_DIR=/home/srinitca/capstone/dataset/nerf_synthetic/$SCENE/
+DATA_DIR=/home/srinitca/capstone/nerf-pytorch/data/nerf_smallfstop/
+SAVE_DIR=test_smallfstop
+
 
 export LD_LIBRARY_PATH=/home/srinitca/capstone/NeReFocus/libs:$LD_LIBRARY_PATH
 
-#rm -rf $TRAIN_DIR/
-python -m train \
+python -m eval \
   --data_dir=$DATA_DIR \
   --train_dir=$TRAIN_DIR \
+  --chunk=3076 \
   --gin_file=configs/defocusblender.gin \
-  --logtostderr \
-  --gin_param="Config.batch_size=512"
+  --logtostderr                  \
+  --gin_param="Config.batch_size=1024" \
+  --save_dir=$SAVE_DIR

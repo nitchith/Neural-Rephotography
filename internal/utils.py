@@ -96,6 +96,7 @@ def define_common_flags():
       'gin_param', None, 'Newline separated list of Gin parameter bindings.')
   flags.DEFINE_string('train_dir', None, 'where to store ckpts and logs')
   flags.DEFINE_string('data_dir', None, 'input data directory.')
+  flags.DEFINE_string('save_dir', "test_preds", 'output save data directory.')
   flags.DEFINE_integer(
       'chunk', 8192,
       'the size of chunks for evaluation inferences, set to the value that'
