@@ -40,7 +40,7 @@ flags.DEFINE_bool(
     'checkpoints if any exist.')
 flags.DEFINE_bool('save_output', True,
                   'If True, save predicted images to disk.')
-
+jax.config.update("jax_enable_x64", True)
 
 def main(unused_argv):
   config = utils.load_config()
@@ -76,7 +76,7 @@ def main(unused_argv):
 
   last_step = 0
   out_dir = path.join(FLAGS.train_dir,
-                      'path_renders' if config.render_path else 'test_preds')
+                      'path_renders' if config.render_path else FLAGS.save_dir)
   if not FLAGS.eval_once:
     summary_writer = tensorboard.SummaryWriter(
         path.join(FLAGS.train_dir, 'eval'))

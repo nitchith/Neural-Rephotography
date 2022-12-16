@@ -25,6 +25,7 @@ import jax.numpy as jnp
 from internal import mip
 from internal import utils
 
+import pdb 
 
 @gin.configurable
 class MipNerfModel(nn.Module):
@@ -47,40 +48,6 @@ class MipNerfModel(nn.Module):
   disable_integration: bool = False  # If True, use PE instead of IPE.
 
   @nn.compact
-  def get_tvals_samples(self, i_level, rays, key, randomized, weights, focaldist):
-    if i_level == 0:
-        # Stratified sampling along rays
-        #TODO: Pass tc information
-        t_vals, samples = mip.sample_along_rays(
-            key,
-            rays.origins,
-            rays.directions,
-            rays.radii,
-            self.num_samples,
-            rays.near,
-            rays.far,
-            randomized,
-            self.lindisp,
-            self.ray_shape,
-            rays.focaldist
-        )
-    else:
-        t_vals, samples = mip.resample_along_rays(
-            key,
-            rays.origins,
-            rays.directions,
-            rays.radii,
-            t_vals,
-            weights,
-            randomized,
-            self.ray_shape,
-            self.stop_level_grad,
-            resample_padding=self.resample_padding,
-            focaldist = rays.focaldist
-        )
-    return t_vals, samples
-
-  @nn.compact
   def __call__(self, rng, rays, randomized, white_bkgd):
     """The mip-NeRF Model.
 
@@ -97,10 +64,40 @@ class MipNerfModel(nn.Module):
     mlp = MLP()
 
     ret = []
+    weights = None
     for i_level in range(self.num_levels):
       key, rng = random.split(rng)
       #TODO: Pass tc information
-      t_vals, samples = self.get_tvals_samples(i_level, rays, key, randomized, weights, focaldist=None)
+      if i_level == 0:
+      # Stratified sampling along rays
+        #pdb.set_trace()
+        t_vals, samples = mip.sample_along_rays(
+            key,
+            rays.origins,
+            rays.directions,
+            rays.radii,
+            self.num_samples,
+            rays.near,
+            rays.far,
+            randomized,
+            self.lindisp,
+            self.ray_shape,
+            focaldist = rays.focaldist
+        )
+      else:
+        t_vals, samples = mip.resample_along_rays(
+            key,
+            rays.origins,
+            rays.directions,
+            rays.radii,
+            t_vals,
+            weights,
+            randomized,
+            self.ray_shape,
+            self.stop_level_grad,
+            resample_padding=self.resample_padding,
+            focaldist = rays.focaldist
+        )
 
       if self.disable_integration:
         samples = (samples[0], jnp.zeros_like(samples[1]))
@@ -248,7 +245,7 @@ def render_image(render_fn, rays, rng, chunk=8192):
   num_rays = height * width
   rays = utils.namedtuple_map(lambda r: r.reshape((num_rays, -1)), rays)
 
-  host_id = jax.host_id()
+  host_id = jax.process_index()
   results = []
   for i in range(0, num_rays, chunk):
     # pylint: disable=cell-var-from-loop

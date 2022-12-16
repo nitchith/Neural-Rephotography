@@ -20,7 +20,9 @@ from jax import random
 import jax.numpy as jnp
 
 from internal import math
+import numpy as np
 
+import pdb
 
 def pos_enc(x, min_deg, max_deg, append_identity=True):
   """The positional encoding used by the original NeRF paper."""
@@ -97,6 +99,7 @@ def conical_frustum_to_gaussian(d, t0, t1, base_radius, diag, stable=True):
     r_var = base_radius**2 * (3 / 20 * (t1**5 - t0**5) / (t1**3 - t0**3))
     t_mosq = 3 / 5 * (t1**5 - t0**5) / (t1**3 - t0**3)
     t_var = t_mosq - t_mean**2
+  
   return lift_gaussian(d, t_mean, t_var, r_var, diag)
 
 
@@ -136,15 +139,13 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
   Returns:
     a tuple of arrays of means and covariances.
   """
-  t0 = t_vals[..., :-1]
-  t1 = t_vals[..., 1:]
-  
-  # Update t0, t1 
+
+  # Offset t_val
   if focaldist is not None:
-    t0_ = jnp.abs(t0 - focaldist)
-    t1_ = jnp.abs(t1 - focaldist)
-    t0 = jnp.minimum(t0_, t1_)
-    t1 = jnp.maximum(t0_, t1_)
+    t_vals_ = t_vals - focaldist
+
+  t0 = t_vals_[..., :-1]
+  t1 = t_vals_[..., 1:]
 
   if ray_shape == 'cone':
     gaussian_fn = conical_frustum_to_gaussian
@@ -157,7 +158,7 @@ def cast_rays(t_vals, origins, directions, radii, ray_shape, diag=True, focaldis
 
   #TODO: Review this implementation
   if focaldist is not None:
-    means = means + origins[..., None, :] + directions[..., None, :] * focaldist[..., None]
+    means = means + directions[..., None, :] * focaldist[..., None] + origins[..., None, :]
   else:
     means = means + origins[..., None, :]
 
@@ -285,7 +286,7 @@ def sample_along_rays(key, origins, directions, radii, num_samples, near, far,
     t_vals = jnp.concatenate([t_vals,focaldist], axis=1)
     t_vals = jnp.sort(t_vals, axis=1)
 
-  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist)
+  means, covs = cast_rays(t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
   return t_vals, (means, covs)
 
 
@@ -329,7 +330,15 @@ def resample_along_rays(key, origins, directions, radii, t_vals, weights,
       t_vals.shape[-1],
       randomized,
   )
+  
+  #Add focaldist to t_vals
+  if focaldist is not None:
+    focaldist = jnp.broadcast_to(focaldist,[new_t_vals.shape[0], 1])
+    new_t_vals = jnp.concatenate([new_t_vals,focaldist], axis=1)
+    new_t_vals = jnp.sort(new_t_vals, axis=1)
+
   if stop_grad:
     new_t_vals = lax.stop_gradient(new_t_vals)
-  means, covs = cast_rays(new_t_vals, origins, directions, radii, ray_shape)
+
+  means, covs = cast_rays(new_t_vals, origins, directions, radii, ray_shape, focaldist=focaldist)
   return new_t_vals, (means, covs)

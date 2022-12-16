@@ -17,12 +17,13 @@
 
 SCENE=lego
 EXPERIMENT=debug
-TRAIN_DIR=/Users/barron/tmp/nerf_results/$EXPERIMENT/$SCENE
-DATA_DIR=/Users/barron/data/nerf_synthetic/$SCENE
+TRAIN_DIR=/home/rohanc/capstone/NeReFocus/tmp/$SCENE/
+DATA_DIR=/home/rohanc/capstone/blender_dataset/results_lego_scaled/
 
 python -m eval \
   --data_dir=$DATA_DIR \
   --train_dir=$TRAIN_DIR \
   --chunk=3076 \
-  --gin_file=configs/blender.gin \
-  --logtostderr
+  --gin_file=configs/fablender.gin \
+  --logtostderr                  \
+  --gin_param="Config.batch_size=1024"

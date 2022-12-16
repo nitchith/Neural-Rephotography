@@ -32,6 +32,7 @@ python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.go
 
 ```
 
+
 ### Alternate way (from original repo)
 
 ```
@@ -51,7 +52,14 @@ pip install -r requirements.txt
 pip install --upgrade jax jaxlib==0.1.65+cuda101 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 ```
 
-
+```
+conda create --name ${env_name} python=3.6.13
+conda activate ${env_name}
+conda install -c conda-forge cudatoolkit-dev=11.0 # Make sure nvidia drivers support cuda-11.0
+pip install -r requirements.txt
+python -m pip install tensorflow==2.4.0
+python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+```
 ## Data
 
 Then, you'll need to download the datasets

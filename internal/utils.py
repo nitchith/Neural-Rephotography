@@ -75,18 +75,18 @@ class Config:
   grad_max_norm: float = 0.  # Gradient clipping magnitude, disabled if == 0.
   grad_max_val: float = 0.  # Gradient clipping value, disabled if == 0.
   max_steps: int = 1000000  # The number of optimization steps.
-  save_every: int = 100000  # The number of steps to save a checkpoint.
+  save_every: int = 5000  # The number of steps to save a checkpoint.
   print_every: int = 100  # The number of steps between reports to tensorboard.
   gc_every: int = 10000  # The number of steps between garbage collections.
   test_render_interval: int = 1  # The interval between images saved to disk.
   disable_multiscale_loss: bool = False  # If True, disable multiscale loss.
   randomized: bool = True  # Use randomized stratified sampling.
-  near: float = 2.  # Near plane distance.
-  far: float = 6.  # Far plane distance.
+  near: float = 1.1  # Near plane distance.
+  far: float = 4  # Far plane distance.
   coarse_loss_mult: float = 0.1  # How much to downweight the coarse loss(es).
   weight_decay_mult: float = 0.  # The multiplier on weight decay.
   white_bkgd: bool = True  # If True, use white as the background (black o.w.).
-
+  defocus_radius: str = "same" # same: Use same radius for all pixels
 
 def define_common_flags():
   # Define the flags used by both train.py and eval.py
@@ -96,6 +96,7 @@ def define_common_flags():
       'gin_param', None, 'Newline separated list of Gin parameter bindings.')
   flags.DEFINE_string('train_dir', None, 'where to store ckpts and logs')
   flags.DEFINE_string('data_dir', None, 'input data directory.')
+  flags.DEFINE_string('save_dir', "test_preds", 'output save data directory.')
   flags.DEFINE_integer(
       'chunk', 8192,
       'the size of chunks for evaluation inferences, set to the value that'

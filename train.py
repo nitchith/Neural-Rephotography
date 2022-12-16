@@ -41,7 +41,7 @@ flags.DEFINE_integer('render_every', 5000,
                      'The number of steps between test set image renderings.')
 
 jax.config.parse_flags_with_absl()
-
+jax.config.update("jax_enable_x64", True)
 
 def train_step(model, config, rng, state, batch, lr):
   """One optimization step.
@@ -86,6 +86,7 @@ def train_step(model, config, rng, state, batch, lr):
     for (rgb, _, _) in ret:
       losses.append(
           (mask * (rgb - batch['pixels'][..., :3])**2).sum() / mask.sum())
+
     losses = jnp.array(losses)
 
     loss = (
@@ -155,6 +156,7 @@ def main(unused_argv):
   if config.batch_size % jax.device_count() != 0:
     raise ValueError('Batch size must be divisible by the number of devices.')
 
+  # Read dataset
   dataset = datasets.get_dataset('train', FLAGS.data_dir, config)
   test_dataset = datasets.get_dataset('test', FLAGS.data_dir, config)
 
@@ -201,8 +203,8 @@ def main(unused_argv):
 
   ssim_fn = jax.jit(functools.partial(math.compute_ssim, max_val=1.))
 
-  if not utils.isdir(FLAGS.train_dir):
-    utils.makedirs(FLAGS.train_dir)
+  #if not utils.isdir(FLAGS.train_dir):
+  #  utils.makedirs(FLAGS.train_dir)
   state = checkpoints.restore_checkpoint(FLAGS.train_dir, state)
   # Resume training a the step of the last checkpoint.
   init_step = state.optimizer.state.step + 1
