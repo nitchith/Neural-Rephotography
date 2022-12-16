@@ -1,10 +1,7 @@
-# NeReFocus
+# Neural Rephotographyy | MSCV '22 Capstone
 
-### FA Stack - Lego truck data
-```
-https://drive.google.com/file/d/1g_EClvD-T9DkXDihF5zmsUBXlBi34weK/view?usp=sharing
-```
-
+Team members: Sri Nitchith, [Rohan Chacko](https://github.com/RohanChacko)    
+Advisor: Prof. Aswin Sankaranarayanan
 
 ## Installation
 
@@ -37,7 +34,7 @@ python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.go
 
 ```
 # Clone the repo
-git clone https://github.com/google/mipnerf.git; cd mipnerf
+git clone https://github.com/nitchith/Neural-Rephotography.git; cd Neural-Rephotography
 # Create a conda environment, note you can use python 3.6-3.8 as
 # one of the dependencies (TensorFlow) hasn't supported python 3.9 yet.
 conda create --name mipnerf python=3.6.13; conda activate mipnerf
@@ -60,32 +57,18 @@ pip install -r requirements.txt
 python -m pip install tensorflow==2.4.0
 python -m pip install --upgrade jax jaxlib==0.1.69+cuda110 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 ```
-## Data
+### Data
 
-Then, you'll need to download the datasets
-from the [NeRF official Google Drive](https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1).
-Please download and unzip `nerf_synthetic.zip` and `nerf_llff_data.zip`.
+We will publicly release the lego focus-aperture dataset soon.
 
-### Generate multiscale dataset
-You can generate the multiscale dataset used in the paper by running the following command,
-```
-python scripts/convert_blender_data.py --blenderdir /nerf_synthetic --outdir /multiscale
-```
-
-## Running
-
-Example scripts for training mip-NeRF on individual scenes from the three
-datasets used in the paper can be found in `scripts/`. You'll need to change
-the paths to point to wherever the datasets are located.
-[Gin](https://github.com/google/gin-config) configuration files for our model
-and some ablations can be found in `configs/`.
-An example script for evaluating on the test set of each scene can be found
-in `scripts/`, after which you can use `scripts/summarize.ipynb` to produce
-error metrics across all scenes in the same format as was used in tables in the
-paper.
 
 ### OOM errors
 You may need to reduce the batch size to avoid out of memory errors. For example the model can be run on a NVIDIA 3080 (10Gb) using the following flag. 
 ```
 --gin_param="Config.batch_size = 1024"
 ```
+
+
+### Acknowledgements
+
+This codebase is built on top of the [Mip-NeRF](https://github.com/google/mipnerf) codebase. We thank the authors for open-sourcing their work. We also thank [Neha Boloor](https://github.com/neha-boloor) for her early contributions in this project. 
